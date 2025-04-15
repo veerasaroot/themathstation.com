@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from '@/utils/supabase-server';
 import { Category } from '@/utils/supabase';
 import Link from 'next/link';
 import Image from 'next/image';
+import { JSX } from 'react';
 
 // Function to get all categories
 async function getCategories(): Promise<Category[]> {
@@ -22,15 +23,18 @@ async function getCategoryPostCounts(): Promise<Record<string, number>> {
   
   const { data } = await supabase
     .from('posts')
-    .select('category_id, count')
-    .eq('published', true)
-    .groupBy('category_id');
+    .select('category_id')
+    .eq('published', true);
   
   const counts: Record<string, number> = {};
   
   if (data) {
-    data.forEach((item: any) => {
-      counts[item.category_id] = item.count;
+    // นับเอง
+    data.forEach((post) => {
+      const categoryId = post.category_id;
+      if (categoryId) {
+        counts[categoryId] = (counts[categoryId] || 0) + 1;
+      }
     });
   }
   
